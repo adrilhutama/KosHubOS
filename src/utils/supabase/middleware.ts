@@ -9,8 +9,7 @@ export async function updateSession(req: NextRequest) {
     {
       cookies: {
         getAll: () => req.cookies.getAll(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setAll: (pairs: any) => {
+        setAll(pairs) {
           pairs.forEach(({ name, value }) => req.cookies.set(name, value));
           res = NextResponse.next({ request: req });
           pairs.forEach(({ name, value, options }) =>

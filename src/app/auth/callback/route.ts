@@ -15,8 +15,7 @@ export async function GET(request: Request) {
       {
         cookies: {
           getAll: () => cookieStore.getAll(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setAll: (pairs: any) => {
+          setAll(pairs) {
             pairs.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)
             );
