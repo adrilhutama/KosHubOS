@@ -33,12 +33,15 @@ export async function joinHouse(input: unknown) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Login dulu" };
-  const { data: house } = await supabase
-    .from("houses")
-    .select("id")
-    .eq("invite_code", parsed.data.inviteCode)
-    .single();
-  if (!house) return { error: "Kode tidak ditemukan" };
+  const { data: houseData, error: rpcError } = await supabase.rpc(
+    "find_house_by_invite_code",
+    { p_code: parsed.data.inviteCode }
+  );
+
+  const house = houseData?.[0];
+  if (rpcError || !house) {
+    return { error: "Kode tidak ditemukan" };
+  }
   const { error } = await supabase.from("house_members").upsert(
     { house_id: house.id, user_id: user.id, role: "member", status: "active" },
     { onConflict: "house_id,user_id" }

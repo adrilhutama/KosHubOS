@@ -361,3 +361,21 @@ drop policy if exists "receipts_member_delete" on storage.objects;
 create policy "receipts_member_delete" on storage.objects
   for delete to authenticated
   using (bucket_id='receipts' and public.is_house_member((storage.foldername(name))[1]::uuid));
+
+-- 8. Invite-code lookup for onboarding.
+--    New users are not yet members, so RLS hides houses rows.
+--    SECURITY DEFINER bypasses RLS and returns only id + name.
+create or replace function public.find_house_by_invite_code(p_code text)
+returns table (id uuid, name text)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select h.id, h.name
+  from public.houses h
+  where h.invite_code = upper(trim(p_code))
+  limit 1;
+$$;
+
+grant execute on function public.find_house_by_invite_code(text) to authenticated;
