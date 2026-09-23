@@ -33,7 +33,7 @@ export default async function GuestsPage() {
     notes: string;
     logged_by: string | null;
   }[];
-  const loggerIds = [...new Set(rows.map((r) => r.logged_by).filter(Boolean))] as string[];
+  const loggerIds = Array.from(new Set(rows.map((r) => r.logged_by).filter(Boolean))) as string[];
   const { data: profiles } = loggerIds.length
     ? await supabase.from("profiles").select("id, full_name").in("id", loggerIds)
     : { data: [] as { id: string; full_name: string }[] };
